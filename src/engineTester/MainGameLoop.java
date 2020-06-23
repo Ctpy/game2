@@ -1,7 +1,10 @@
 package engineTester;
 
+import models.RawModel;
+import models.TexturedModel;
 import org.lwjgl.opengl.Display;
 import renderEngine.*;
+import textures.ModelTexture;
 
 public class MainGameLoop {
 
@@ -25,11 +28,13 @@ public class MainGameLoop {
         };
 
         RawModel model = loader.loadToVAO(vertices, indices);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("image"));
+        TexturedModel texturedModel = new TexturedModel(model, texture);
 
         while (!Display.isCloseRequested()){
             render.prepare();
             staticShader.start();
-            render.render(model);
+            render.render(texturedModel);
             //game logic
             //render
             staticShader.stop();
