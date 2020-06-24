@@ -16,7 +16,7 @@ public class DisplayManager {
         try {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
             Display.create(new PixelFormat(), attribs);
-            Display.setTitle("Pandaaas");
+            Display.setTitle("Some Bullshit");
         } catch (LWJGLException e) {
             e.printStackTrace();
         }
