@@ -1,8 +1,12 @@
 package engineTester;
 
+import entities.Camera;
+import entities.Entity;
+import entities.Light;
 import models.RawModel;
 import models.TexturedModel;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
 import textures.ModelTexture;
 
@@ -12,29 +16,29 @@ public class MainGameLoop {
         DisplayManager.createDisplay();
 
         Loader loader = new Loader();
-        Render render = new Render();
         StaticShader staticShader = new StaticShader();
+        Render render = new Render(staticShader);
 
-        float[] vertices = {
-                -0.5f, 0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f,
-        };
 
-        int[] indices = {
-                0, 1, 3,
-                3, 1, 2
-        };
+        RawModel model = OBJLoader.loadOBJModel("dragon", loader);
 
-        RawModel model = loader.loadToVAO(vertices, indices);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("image"));
+        ModelTexture texture = new ModelTexture(loader.loadTexture("kingblue"));
         TexturedModel texturedModel = new TexturedModel(model, texture);
+        texture.setShineDamper(10);
+        texture.setReflectivity(1);
 
+        Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -25), 0, 0, 0, 1);
+        Light light = new Light(new Vector3f(200, 200, 100), new Vector3f(1, 1, 1));
+
+        Camera camera = new Camera();
         while (!Display.isCloseRequested()){
+            entity.increaseRotation(0, 1, 0);
+            camera.move();
             render.prepare();
             staticShader.start();
-            render.render(texturedModel);
+            staticShader.loadLight(light);
+            staticShader.loadViewMatrix(camera);
+            render.render(entity, staticShader);
             //game logic
             //render
             staticShader.stop();
