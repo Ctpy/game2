@@ -16,9 +16,6 @@ public class MainGameLoop {
         DisplayManager.createDisplay();
 
         Loader loader = new Loader();
-        StaticShader staticShader = new StaticShader();
-        Render render = new Render(staticShader);
-
 
         RawModel model = OBJLoader.loadOBJModel("dragon", loader);
 
@@ -31,21 +28,19 @@ public class MainGameLoop {
         Light light = new Light(new Vector3f(200, 200, 100), new Vector3f(1, 1, 1));
 
         Camera camera = new Camera();
+
+        MasterRender masterRender = new MasterRender();
         while (!Display.isCloseRequested()){
             entity.increaseRotation(0, 1, 0);
             camera.move();
-            render.prepare();
-            staticShader.start();
-            staticShader.loadLight(light);
-            staticShader.loadViewMatrix(camera);
-            render.render(entity, staticShader);
+            masterRender.processEntity(entity);
             //game logic
             //render
-            staticShader.stop();
+            masterRender.render(light, camera);
             DisplayManager.updateDisplay();
         }
 
-        staticShader.cleanUp();
+        masterRender.cleanUp();
         loader.cleanUp();
         DisplayManager.closeDisplay();
     }
