@@ -24,18 +24,32 @@ public class MainGameLoop {
 
         RawModel model = OBJLoader.loadOBJModel("tree", loader);
         RawModel model2 = OBJLoader.loadOBJModel("stall", loader);
+        RawModel model3 = OBJLoader.loadOBJModel("dragon", loader);
+
+
 
         ModelTexture texture = new ModelTexture(loader.loadTexture("tree"));
         ModelTexture texture2 = new ModelTexture(loader.loadTexture("stallTexture"));
+        ModelTexture texture3 = new ModelTexture(loader.loadTexture("kingblue"));
+        TexturedModel grass = new TexturedModel(OBJLoader.loadOBJModel("grassModel", loader), new ModelTexture(loader.loadTexture("grassTexture")));
+        TexturedModel fern = new TexturedModel(OBJLoader.loadOBJModel("fern", loader), new ModelTexture(loader.loadTexture("fern")));
+        grass.getTexture().setHasTransparency(true);
+        grass.getTexture().setHasFakeLighting(true);
+        fern.getTexture().setHasTransparency(true);
+        fern.getTexture().setHasFakeLighting(true);
         TexturedModel texturedModel = new TexturedModel(model, texture);
         TexturedModel texturedModel2 = new TexturedModel(model2, texture2);
+        TexturedModel texturedModel3 = new TexturedModel(model3, texture3);
 
         Random random = new Random();
         List<Entity> entities = new ArrayList<>();
-        for (int i = 0; i < 100; i++){
+        for (int i = 0; i < 500; i++){
             entities.add(new Entity(texturedModel, new Vector3f(random.nextInt(1000), 0, random.nextInt(1000)), 0, 0, 0, 10));
+            entities.add(new Entity(grass, new Vector3f(random.nextInt(1000), 0, random.nextInt(1000)), 0, 0, 0, 1));
+            entities.add(new Entity(fern, new Vector3f(random.nextInt(1000), 0, random.nextInt(1000)), 0, 0, 0, 1));
         }
         entities.add(new Entity(texturedModel2, new Vector3f(50, 0, 50), 0, 180,0, 3));
+        entities.add(new Entity(texturedModel3, new Vector3f(0, 0, 0), 0, 90,0, 1));
 
 
         Light light = new Light(new Vector3f(3000,2000,2000), new Vector3f(1,1,1));
@@ -52,6 +66,8 @@ public class MainGameLoop {
             masterRender.processTerrain(terrain);
             masterRender.processTerrain(terrain2);
             for (Entity entity: entities) {
+                entity.getModel().getTexture().setReflectivity(1);
+                entity.getModel().getTexture().setShineDamper(10);
                 masterRender.processEntity(entity);
             }
 
