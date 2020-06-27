@@ -10,6 +10,8 @@ import org.lwjgl.util.vector.Vector3f;
 import renderEngine.*;
 import terrain.Terrain;
 import textures.ModelTexture;
+import textures.TerrainTexture;
+import textures.TerrainTexturePack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,16 @@ public class MainGameLoop {
         DisplayManager.createDisplay();
 
         Loader loader = new Loader();
+
+        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
+        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("mud"));
+        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("pinkFlowers"));
+        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
+
+        TerrainTexturePack terrainTexturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
+
+
 
         RawModel model = OBJLoader.loadOBJModel("tree", loader);
         RawModel model2 = OBJLoader.loadOBJModel("stall", loader);
@@ -54,8 +66,8 @@ public class MainGameLoop {
 
         Light light = new Light(new Vector3f(3000,2000,2000), new Vector3f(1,1,1));
 
-        Terrain terrain = new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass")));
-        Terrain terrain2 = new Terrain(1, 0, loader, new ModelTexture(loader.loadTexture("grass")));
+        Terrain terrain = new Terrain(0, 0, loader, terrainTexturePack, blendMap);
+        Terrain terrain2 = new Terrain(1, 0, loader, terrainTexturePack, blendMap);
 
         Camera camera = new Camera();
 
@@ -68,6 +80,7 @@ public class MainGameLoop {
             for (Entity entity: entities) {
                 entity.getModel().getTexture().setReflectivity(1);
                 entity.getModel().getTexture().setShineDamper(10);
+                entity.increaseRotation(0, 1, 0);
                 masterRender.processEntity(entity);
             }
 
