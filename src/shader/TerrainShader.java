@@ -6,7 +6,11 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import toolbox.Math;
 
+import java.util.List;
+
 public class TerrainShader extends ShaderProgram{
+
+    private static final int MAX_LIGHTS = 4;
 
     private static final String VERTEX_FILE = "src/shader/terrainVertexShader.txt";
     private static final String FRAGMENT_FILE = "src/shader/terrainFragmentShader.txt";
@@ -14,8 +18,8 @@ public class TerrainShader extends ShaderProgram{
     private int location_transformationMatrix;
     private int location_projectionMatrix;
     private int location_viewMatrix;
-    private int location_lightPosition;
-    private int location_lightColour;
+    private int location_lightPosition[];
+    private int location_lightColour[];
     private int location_shinyDamper;
     private int location_reflectivity;
     private int location_skyColour;
@@ -34,8 +38,6 @@ public class TerrainShader extends ShaderProgram{
         location_transformationMatrix = super.getUniformLocation("transformationMatrix");
         location_projectionMatrix = super.getUniformLocation("projectionMatrix");
         location_viewMatrix = super.getUniformLocation("viewMatrix");
-        location_lightPosition = super.getUniformLocation("lightPosition");
-        location_lightColour = super.getUniformLocation("lightColour");
         location_shinyDamper = super.getUniformLocation("shinyDamper");
         location_reflectivity = super.getUniformLocation("reflectivity");
         location_skyColour = super.getUniformLocation("skyColour");
@@ -44,6 +46,8 @@ public class TerrainShader extends ShaderProgram{
         location_gTexture = super.getUniformLocation("gTexture");
         location_bTexture = super.getUniformLocation("bTexture");
         location_blendMap = super.getUniformLocation("blendMap");
+        location_lightPosition = new int[MAX_LIGHTS];
+        location_lightColour = new int[MAX_LIGHTS];
     }
 
     public void connectTextureUnits(){
@@ -70,9 +74,16 @@ public class TerrainShader extends ShaderProgram{
         super.loadFloat(location_reflectivity, reflectivity);
     }
 
-    public void loadLight(Light light){
-        super.loadVector(location_lightPosition, light.getPosition());
-        super.loadVector(location_lightColour, light.getColour());
+    public void loadLight(List<Light> light){
+        for (int i = 0; i < MAX_LIGHTS; i++){
+            if (i < light.size()){
+                super.loadVector(location_lightPosition[i], light.get(i).getPosition());
+                super.loadVector(location_lightColour[i], light.get(i).getColour());
+            } else {
+                super.loadVector(location_lightPosition[i], new Vector3f(0, 0, 0));
+                super.loadVector(location_lightColour[i], new Vector3f(0, 0, 0));
+            }
+        }
     }
 
 
